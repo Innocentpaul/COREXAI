@@ -1,0 +1,24 @@
+name: corexai
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10  # Use Python 3.10 for better compatibility
+  - numpy
+  - pandas
+  - scikit-learn
+  - flask
+  - matplotlib
+  - seaborn
+  - plotly
+  - pillow
+  - pip
+  - pip:
+    - shap
+    - lime
+    - joblib
+    - werkzeug
+    - jinja2
+    - markupsafe
+    - click
+    - itsdangerous

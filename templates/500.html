@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Error - AI Explainability Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body class="bg-dark text-light">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card bg-dark border-secondary text-center">
+                    <div class="card-body py-5">
+                        <i class="fas fa-server text-danger fa-5x mb-4 pulse"></i>
+                        <h1 class="display-1 fw-bold">500</h1>
+                        <h2 class="text-primary mb-4">Server Error</h2>
+                        <p class="lead mb-4">We encountered an unexpected error while processing your request.</p>
+                        <p class="text-muted mb-4">Our team has been notified and is working to resolve the issue.</p>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <a href="{{ url_for('home') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-home me-2"></i>Return to Dashboard
+                            </a>
+                            <button onclick="window.location.reload();" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-sync-alt me-2"></i>Try Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Add a simple animation for the server icon -->
+    <style>
+        .pulse {
+            animation: pulse-animation 2s infinite;
+        }
+        
+        @keyframes pulse-animation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); }
+        }
+    </style>
+</body>
+</html>

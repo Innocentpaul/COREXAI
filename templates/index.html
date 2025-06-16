@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>COREXAI Visual Explainers</title>
+  <!-- Futuristic Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay">
+    <div class="loader"></div>
+    <p>Generating Explanation...</p>
+  </div>
+
+  <div class="page-container">
+    <!-- Header Bar -->
+    <header class="main-header">
+      <div class="logo-container">
+        <i class="fa-solid fa-brain fa-2x logo-icon pulse"></i>
+        <h1>COREXAI Visual Explainers</h1>
+      </div>
+      <div class="header-controls">
+        <button id="themeToggle" class="theme-toggle">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button id="helpBtn" class="help-button">
+          <i class="fa-solid fa-circle-question"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Control Panel -->
+      <section class="control-panel">
+        <div class="panel-section">
+          <h2>Model Configuration</h2>
+          <div class="form-group">
+            <label for="modelSelect">Detection Type</label>
+            <select id="modelSelect" class="styled-select">
+              <option value="intrusion">Intrusion Detection</option>
+              <option value="fraud">Financial Fraud Detection</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="explanationType">Explanation Type</label>
+            <select id="explanationType" class="styled-select">
+              <option value="shap_2d">SHAP 2D (Waterfall)</option>
+              <option value="shap_3d">SHAP 3D (Interactive)</option>
+              <option value="shap_beeswarm">SHAP Beeswarm</option>
+              <option value="shap_force">SHAP Force Plot</option>
+              <option value="lime_2d">LIME 2D</option>
+              <option value="lime_3d">LIME 3D (Interactive)</option>
+              <option value="feature_correlation">Feature Correlation Heatmap</option>
+              <option value="feature_comparison">Feature Importance Comparison</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h2>Advanced Options</h2>
+          <div class="form-group">
+            <label for="numSamples">Number of Samples</label>
+            <div class="range-container">
+              <input type="range" id="numSamples" min="1" max="100" value="1" class="slider">
+              <span id="numSamplesValue">1</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="topFeatures">Top Features to Display</label>
+            <div class="range-container">
+              <input type="range" id="topFeatures" min="5" max="30" value="10" class="slider">
+              <span id="topFeaturesValue">10</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="checkbox-container">
+              <input type="checkbox" id="useCustomData" class="styled-checkbox">
+              <label for="useCustomData">Use Custom Data</label>
+            </div>
+          </div>
+
+          <div id="customDataContainer" class="form-group" style="display: none;">
+            <label for="customDataInput">Custom Data Input (JSON array)</label>
+            <textarea id="customDataInput" rows="4" placeholder='[0.1, 0.2, 0.3, ...]'></textarea>
+            <small>Enter exactly 30 comma-separated values for the selected model</small>
+          </div>
+          
+          <!-- Add Feature Inputs Container -->
+          <div id="featureInputs" class="feature-inputs-container">
+            <!-- Feature input fields will be dynamically added here -->
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <button id="generateBtn" class="primary-button">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Explanation
+          </button>
+          <button id="downloadBtn" class="secondary-button" disabled>
+            <i class="fa-solid fa-download"></i> Download Results
+          </button>
+        </div>
+      </section>
+
+      <!-- Visualization Area -->
+      <section class="visualization-area">
+        <div class="tabs">
+          <button class="tab-button active" data-tab="visualization">Visualization</button>
+          <button class="tab-button" data-tab="prediction">Prediction Results</button>
+          <button class="tab-button" data-tab="features">Feature Details</button>
+        </div>
+
+        <div class="tab-content">
+          <!-- Visualization Tab -->
+          <div id="visualization" class="tab-pane active">
+            <div class="visualization-container">
+              <!-- Container for 2D plots (images) -->
+              <div id="imageContainer" class="visual-container">
+                <img id="explanationImage" src="/static/images/chart.png" alt="Explanation will appear here">
+              </div>
+              
+              <!-- Container for 3D interactive plots (HTML) -->
+              <div id="plotlyContainer" class="visual-container" style="display: none;">
+                <!-- Plotly chart will be inserted here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Prediction Results Tab -->
+          <div id="prediction" class="tab-pane">
+            <div class="results-container">
+              <div class="result-card">
+                <h3>Prediction</h3>
+                <div class="prediction-indicator">
+                  <div id="predictionLabel" class="prediction-label">Awaiting results...</div>
+                </div>
+              </div>
+              
+              <div class="result-card">
+                <h3>Confidence</h3>
+                <div class="confidence-meter">
+                  <div id="confidenceMeter" class="confidence-bar" style="width: 0%">0%</div>
+                </div>
+              </div>
+              
+              <div class="result-card full-width">
+                <h3>Probability Distribution</h3>
+                <div id="probabilityChart" class="probability-chart">
+                  <!-- Probability chart will be inserted here -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature Details Tab -->
+          <div id="features" class="tab-pane">
+            <div class="feature-container">
+              <div class="feature-search">
+                <input type="text" id="featureSearch" placeholder="Search features...">
+              </div>
+              <div id="featureList" class="feature-list">
+                <!-- Feature details will be populated here -->
+                <p class="empty-state">Generate an explanation to see feature details</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Info/Help Modal -->
+    <div id="helpModal" class="modal">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>About COREXAI Visual Explainers</h2>
+        <div class="modal-body">
+          <h3>What are these visualizations?</h3>
+          <p>This interface provides multiple visualization methods to help explain AI model decisions for intrusion detection and financial fraud detection systems.</p>
+          
+          <h3>Explanation Types:</h3>
+          <ul>
+            <li><strong>SHAP 2D (Waterfall):</strong> Shows how each feature contributes to pushing the model output from the base value to the final prediction.</li>
+            <li><strong>SHAP 3D:</strong> Interactive 3D visualization showing the relationship between feature values and their impact on the model's decision.</li>
+            <li><strong>SHAP Beeswarm:</strong> Displays feature impact across multiple samples to identify global patterns.</li>
+            <li><strong>SHAP Force Plot:</strong> Visualizes how features push the prediction from the base value in a horizontal layout.</li>
+            <li><strong>LIME 2D:</strong> Local interpretable model-agnostic explanations showing feature importance for this specific prediction.</li>
+            <li><strong>LIME 3D:</strong> Interactive 3D representation of LIME explanations with feature values.</li>
+            <li><strong>Feature Correlation Heatmap:</strong> Shows correlations between the most important features in the model.</li>
+            <li><strong>Feature Importance Comparison:</strong> Compares feature importance across different explanation methods (Model, SHAP, LIME).</li>
+          </ul>
+          
+          <h3>Tips for Use:</h3>
+          <ul>
+            <li>For SHAP Beeswarm plots, use at least 10 samples for meaningful visualization.</li>
+            <li>Adjust the "Top Features" slider to focus on the most impactful features.</li>
+            <li>Interactive 3D plots can be rotated and zoomed for better exploration.</li>
+            <li>Use the Feature Details tab to see exact impact values for each feature.</li>
+            <li>Toggle between dark and light themes using the moon/sun icon.</li>
+          </ul>
+          
+          <h3>Understanding the Results:</h3>
+          <ul>
+            <li><strong>Positive SHAP values</strong> (red) push the prediction towards the positive class (Malicious/Fraudulent).</li>
+            <li><strong>Negative SHAP values</strong> (blue) push the prediction towards the negative class (Normal/Legitimate).</li>
+            <li><strong>Feature correlations</strong> help identify which features tend to occur together.</li>
+            <li><strong>Confidence scores</strong> indicate how certain the model is about its prediction.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom JavaScript -->
+  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Animate.css for animations -->
+  <link rel="stylesheet" href="https
